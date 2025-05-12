@@ -159,7 +159,7 @@ const Canvas = forwardRef(({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Delete" || e.key === "Backspace") {
+    if (e.key === "Delete" ) {
       if (selectedElements && selectedElements.length > 0) {
         // Delete all selected elements
         selectedElements.forEach(id => onDeleteElement(id));
