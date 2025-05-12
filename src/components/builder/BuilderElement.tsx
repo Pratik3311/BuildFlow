@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ElementData } from "@/types/builder";
 import { GripVertical, Image as ImageIcon } from "lucide-react";
@@ -22,15 +21,22 @@ const BuilderElement = ({
 }: BuilderElementProps) => {
   const [imageInput, setImageInput] = useState<string>("");
 
-  const handleDoubleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (element.type === "text" || element.type === "button") {
-      setEditing(true);
+      setEditing(true); // Enable editing on single click
     }
   };
 
   const handleBlur = () => {
-    setEditing(false);
+    setEditing(false); // Disable editing when focus is lost
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Allow default behavior for Ctrl + A (or Cmd + A on macOS)
+    if ((e.ctrlKey || e.metaKey) && e.key === "a") {
+      return; // Let the browser handle the default select-all behavior
+    }
   };
 
   const renderElementContent = () => {
@@ -47,6 +53,7 @@ const BuilderElement = ({
             value={element.content || ""}
             onChange={(e) => onTextChange(e.target.value)}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown} // Add keydown handler
             autoFocus
             className="w-full h-full border-none focus:outline-none resize-none p-0 bg-transparent"
             style={commonStyle}
@@ -54,8 +61,8 @@ const BuilderElement = ({
         ) : (
           <div
             style={commonStyle}
-            onDoubleClick={handleDoubleClick}
-            className="w-full h-full overflow-hidden"
+            onClick={handleClick} // Enable editing on single click
+            className="w-full h-full overflow-hidden cursor-text"
           >
             {element.content}
           </div>
@@ -75,7 +82,7 @@ const BuilderElement = ({
           <button
             style={commonStyle}
             className="w-full h-full"
-            onDoubleClick={handleDoubleClick}
+            onClick={handleClick} // Enable editing on single click
           >
             {element.content}
           </button>
@@ -94,18 +101,28 @@ const BuilderElement = ({
               <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded p-4">
                 <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
                 <p className="text-sm text-gray-500 mb-2">Upload an image</p>
-                <input 
-                  type="text" 
-                  value={imageInput} 
-                  onChange={(e) => setImageInput(e.target.value)}
-                  placeholder="Enter image URL"
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        if (reader.result) {
+                          onImageChange(reader.result.toString());
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
                   className="w-full p-1 text-sm border rounded mb-2"
                 />
                 <button
-                  onClick={() => onImageChange(imageInput)}
+                  onClick={() => setImageInput("")}
                   className="bg-blue-500 text-white text-xs py-1 px-2 rounded"
                 >
-                  Set Image
+                  Clear
                 </button>
               </div>
             )}
