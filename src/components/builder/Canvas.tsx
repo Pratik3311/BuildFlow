@@ -1,4 +1,3 @@
-
 import { useState, useRef, forwardRef, ForwardedRef, useEffect } from "react";
 import Draggable from "react-draggable";
 import { ElementData } from "@/types/builder";
@@ -57,18 +56,29 @@ const Canvas = forwardRef(({
   // Add global keyboard event listener for Ctrl+A
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the active element is an input, textarea, or contenteditable
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement &&
+        (activeElement.tagName === "TEXTAREA" ||
+          activeElement.tagName === "INPUT" ||
+          activeElement.getAttribute("contenteditable") === "true");
+
+      // Skip global Ctrl + A behavior if an input or editable field is focused
+      if (isInputFocused) return;
+
       // Select all elements with Ctrl+A
-      if ((e.key === 'a' || e.key === 'A') && (e.ctrlKey || e.metaKey) && onMultiSelect) {
+      if ((e.key === "a" || e.key === "A") && (e.ctrlKey || e.metaKey) && onMultiSelect) {
         e.preventDefault();
-        const allElementIds = elements.map(el => el.id);
+        const allElementIds = elements.map((el) => el.id);
         onMultiSelect(allElementIds);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [elements, onMultiSelect]);
 
