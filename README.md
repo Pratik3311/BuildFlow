@@ -48,5 +48,5 @@ I treated this as a real-world project, focusing on providing an intuitive and p
 
 You can view the live demo of the project here:
 
-[BuildFlow Demo](https://buildflow.vercel.app)
+[BuildFlow Demo](https://build-flow-one.vercel.app/)
 
